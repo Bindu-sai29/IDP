@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adapthive Intelligence Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366F1;
+            --primary-dark: #4F46E5;
+            --secondary: #10B981;
+            --accent: #F59E0B;
+            --light: #F9FAFB;
+            --dark: #1F2937;
+            --darker: #111827;
+            --success: #22C55E;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --card-bg: #FFFFFF;
+            --sidebar-bg: #1F2937;
+            --sidebar-text: #E5E7EB;
+            --header-bg: #FFFFFF;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+            display: none; /* Initially hidden */
+        }
+
+        /* Login Form - Show by default */
+        .login-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-content {
+            background: white;
+            width: 100%;
+            max-width: 480px;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .login-header h2 {
+            color: var(--primary);
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .login-header p {
+            color: #6B7280;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 18px 20px;
+            border: 1px solid #D1D5DB;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #6B7280;
+        }
+
+        .login-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .login-footer a:hover {
+            color: var(--secondary);
+        }
+
+        .error-message {
+            color: var(--danger);
+            text-align: center;
+            margin-top: 15px;
+            display: none;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            transition: var(--transition);
+        }
+
+        .logo {
+            padding: 0 20px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .logo i {
+            font-size: 32px;
+            color: var(--accent);
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(to right, #8B5CF6, #EC4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            margin: 8px 0;
+            cursor: pointer;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: var(--accent);
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item:hover::before, .nav-item.active::before {
+            transform: translateY(0);
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid var(--accent);
+        }
+
+        .nav-item i {
+            margin-right: 15px;
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .nav-item.active i {
+            color: var(--accent);
+            transform: scale(1.1);
+        }
+
+        .nav-item span {
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-item.active span {
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            transition: var(--transition);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: var(--header-bg);
+            padding: 20px 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px var(--shadow);
+            animation: slideDown 0.5s ease;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Feature Cards */
+        .features-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .feature-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 25px var(--shadow);
+            transition: var(--transition);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .feature-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px var(--shadow);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            color: var(--primary);
+            padding-bottom: 15px;
+            border-bottom: 1px solid #EEE;
+        }
+
+        .card-header i {
+            font-size: 28px;
+            margin-right: 15px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        /* Chatbot Styles */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 400px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            border-radius: 16px;
+            background: #f5f7ff;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            border: 1px solid #e0e7ff;
+        }
+
+        .message {
+            padding: 15px 20px;
+            border-radius: 20px;
+            max-width: 80%;
+            line-height: 1.5;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            animation: messageAppear 0.3s ease;
+        }
+
+        .user-message {
+            background: var(--primary);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .bot-message {
+            background: #eef2ff;
+            color: var(--dark);
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 15px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 16px 20px;
+            border: 1px solid #e0e7ff;
+            border-radius: 50px;
+            background: white;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .chat-input input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .chat-input button {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .chat-input button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Image Classification */
+        .image-upload {
+            border: 2px dashed #d1d1d6;
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 25px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image-upload::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(99, 102, 241, 0.1), rgba(16, 185, 129, 0.1));
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .image-upload:hover::before {
+            opacity: 1;
+        }
+
+        .image-upload:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 220px;
+            margin-top: 20px;
+            border-radius: 12px;
+            display: none;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .classify-btn {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .classify-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .classification-result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f0f4ff;
+            border-radius: 16px;
+            text-align: center;
+            font-weight: 500;
+            border: 1px solid #e0e7ff;
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Speech to Text */
+        .speech-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .speech-text {
+            padding: 20px;
+            border-radius: 16px;
+            background: #f9f9f9;
+            min-height: 150px;
+            border: 1px solid #EEE;
+            transition: var(--transition);
+        }
+
+        .speech-text:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .speech-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .speech-btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .start-btn {
+            background: linear-gradient(45deg, var(--success), #22D3EE);
+            color: white;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+        }
+
+        .stop-btn {
+            background: linear-gradient(45deg, var(--accent), var(--danger));
+            color: white;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        }
+
+        .speech-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* To-Do List */
+        .todo-input {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .todo-input input {
+            flex: 1;
+            padding: 16px 20px;
+            border: 1px solid #e0e7ff;
+            border-radius: 12px;
+            background: white;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .todo-input input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .add-btn {
+            padding: 0 25px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .add-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .todo-list {
+            list-style-type: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .todo-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 20px;
+            background: #f9fafb;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            animation: slideIn 0.4s ease;
+            transition: var(--transition);
+            border-left: 4px solid var(--primary);
+        }
+
+        .todo-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .todo-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .todo-text {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .todo-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .todo-actions button {
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #777;
+            transition: var(--transition);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .todo-actions button:hover {
+            background: #EEE;
+            color: var(--accent);
+        }
+
+        .completed {
+            text-decoration: line-through;
+            color: #9CA3AF;
+            opacity: 0.8;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes messageAppear {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                padding: 15px;
+            }
+            
+            .nav-items {
+                display: flex;
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+            
+            .nav-item {
+                border-left: none;
+                border-bottom: 4px solid transparent;
+                padding: 12px 15px;
+                white-space: nowrap;
+                flex-direction: column;
+                text-align: center;
+                gap: 5px;
+            }
+            
+            .nav-item i {
+                margin-right: 0;
+            }
+            
+            .nav-item:hover::before, .nav-item.active::before {
+                transform: translateY(0);
+                width: 100%;
+                height: 4px;
+                left: 0;
+                top: auto;
+                bottom: 0;
+            }
+            
+            .nav-item:hover, .nav-item.active {
+                border-left: none;
+                border-bottom: 4px solid var(--accent);
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Form - Show by default -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-content">
+            <div class="login-header">
+                <h2>Welcome to Adapthive Intelligence</h2>
+                <p>Sign in to access your intelligent assistant</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="login-btn">Sign In</button>
+                <div class="error-message" id="errorMessage">
+                    Invalid credentials. Please try again.
+                </div>
+            </form>
+            <div class="login-footer">
+                <p>Don't have an account? <a href="#">Sign up</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Container - Initially hidden -->
+    <div class="app-container" id="appContainer">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-brain"></i>
+                <h1>Adapthive Intelligence</h1>
+            </div>
+            <div class="nav-items">
+                <div class="nav-item active" data-target="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" data-target="chatbot">
+                    <i class="fas fa-robot"></i>
+                    <span>AI Assistant</span>
+                </div>
+                <div class="nav-item" data-target="image-analysis">
+                    <i class="fas fa-image"></i>
+                    <span>Image Analysis</span>
+                </div>
+                <div class="nav-item" data-target="speech-to-text">
+                    <i class="fas fa-microphone"></i>
+                    <span>Speech to Text</span>
+                </div>
+                <div class="nav-item" data-target="todo-list">
+                    <i class="fas fa-tasks"></i>
+                    <span>Task Manager</span>
+                </div>
+                <div class="nav-item" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h2>Intelligence Dashboard</h2>
+                <div class="user-info">
+                    <div class="user-avatar">AI</div>
+                    <div>
+                        <h3>Adaptive Assistant</h3>
+                        <p>Powered by AI</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="features-container">
+                <!-- Dashboard Section -->
+                <div class="feature-section" id="dashboard">
+                    <div class="card-header">
+                        <i class="fas fa-home"></i>
+                        <h2>Dashboard Overview</h2>
+                    </div>
+                    <div class="welcome-message">
+                        <h3>Welcome to Adapthive Intelligence Platform</h3>
+                        <p>Select a feature from the sidebar to get started with your intelligent assistant.</p>
+                    </div>
+                </div>
+
+                <!-- Chatbot Section (Initially Hidden) -->
+                <div class="feature-section" id="chatbot" style="display: none;">
+                    <div class="card-header">
+                        <i class="fas fa-robot"></i>
+                        <h2>AI Assistant</h2>
+                    </div>
+                    <div class="chat-container">
+                        <div class="chat-messages">
+                            <div class="message bot-message">
+                                Hello! I'm your adaptive assistant. How can I help you today?
+                            </div>
+                            <div class="message user-message">
+                                Can you explain how this platform works?
+                            </div>
+                            <div class="message bot-message">
+                                This platform combines multiple AI technologies to assist you. You can analyze images, convert speech to text, manage tasks, and chat with me!
+                            </div>
+                        </div>
+                        <div class="chat-input">
+                            <input type="text" placeholder="Type your question here...">
+                            <button><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image Analysis Section (Initially Hidden) -->
+                <div class="feature-section" id="image-analysis" style="display: none;">
+                    <div class="card-header">
+                        <i class="fas fa-image"></i>
+                        <h2>Image Analysis</h2>
+                    </div>
+                    <div class="image-upload">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: var(--primary); margin-bottom: 20px;"></i>
+                        <p>Click to upload an image or drag and drop</p>
+                        <p class="image-format">Supports JPG, PNG, GIF up to 5MB</p>
+                        <img src="" class="image-preview" alt="Image preview">
+                    </div>
+                    <button class="classify-btn">Analyze Image</button>
+                    <div class="classification-result">
+                        Upload an image to analyze its content.
+                    </div>
+                </div>
+
+                <!-- Speech to Text Section (Initially Hidden) -->
+                <div class="feature-section" id="speech-to-text" style="display: none;">
+                    <div class="card-header">
+                        <i class="fas fa-microphone"></i>
+                        <h2>Speech to Text</h2>
+                    </div>
+                    <div class="speech-container">
+                        <div class="speech-text" contenteditable="true">
+                            Your transcribed text will appear here...
+                        </div>
+                        <div class="speech-buttons">
+                            <button class="speech-btn start-btn"><i class="fas fa-microphone"></i> Start Recording</button>
+                            <button class="speech-btn stop-btn" disabled><i class="fas fa-stop"></i> Stop Recording</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- To-Do List Section (Initially Hidden) -->
+                <div class="feature-section" id="todo-list" style="display: none;">
+                    <div class="card-header">
+                        <i class="fas fa-tasks"></i>
+                        <h2>Task Manager</h2>
+                    </div>
+                    <div class="todo-input">
+                        <input type="text" placeholder="Add a new task...">
+                        <button class="add-btn">Add Task</button>
+                    </div>
+                    <ul class="todo-list">
+                        <li class="todo-item">
+                            <div class="todo-text">
+                                <input type="checkbox">
+                                <span>Explore platform features</span>
+                            </div>
+                            <div class="todo-actions">
+                                <button><i class="fas fa-edit"></i></button>
+                                <button><i class="fas fa-trash"></i></button>
+                            </div>
+                        </li>
+                        <li class="todo-item">
+                            <div class="todo-text">
+                                <input type="checkbox">
+                                <span>Test image analysis</span>
+                            </div>
+                            <div class="todo-actions">
+                                <button><i class="fas fa-edit"></i></button>
+                                <button><i class="fas fa-trash"></i></button>
+                            </div>
+                        </li>
+                        <li class="todo-item">
+                            <div class="todo-text">
+                                <input type="checkbox" checked>
+                                <span class="completed">Login to platform</span>
+                            </div>
+                            <div class="todo-actions">
+                                <button><i class="fas fa-edit"></i></button>
+                                <button><i class="fas fa-trash"></i></button>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Login functionality
+            const loginForm = document.getElementById('loginForm');
+            const errorMessage = document.getElementById('errorMessage');
+            const appContainer = document.getElementById('appContainer');
+            const loginModal = document.getElementById('loginModal');
+            
+            // Simple login validation
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                // Simple validation - in a real app, this would connect to a backend
+                if (email && password) {
+                    // Hide login, show app
+                    loginModal.style.display = 'none';
+                    appContainer.style.display = 'flex';
+                } else {
+                    errorMessage.style.display = 'block';
+                }
+            });
+            
+            // Logout functionality
+            const logoutBtn = document.getElementById('logoutBtn');
+            logoutBtn.addEventListener('click', function() {
+                appContainer.style.display = 'none';
+                loginModal.style.display = 'flex';
+                document.getElementById('email').value = '';
+                document.getElementById('password').value = '';
+            });
+            
+            // Navigation functionality
+            const navItems = document.querySelectorAll('.nav-item');
+            const featureSections = document.querySelectorAll('.feature-section');
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const target = this.getAttribute('data-target');
+                    
+                    // Handle logout button separately
+                    if (this.id === 'logoutBtn') {
+                        return;
+                    }
+                    
+                    // Update active nav item
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show the corresponding section
+                    featureSections.forEach(section => {
+                        section.style.display = 'none';
+                    });
+                    
+                    if (target) {
+                        document.getElementById(target).style.display = 'block';
+                    }
+                });
+            });
+            
+            // To-Do List functionality
+            const addButton = document.querySelector('.add-btn');
+            const todoInput = document.querySelector('.todo-input input');
+            const todoList = document.querySelector('.todo-list');
+            
+            addButton.addEventListener('click', function() {
+                if (todoInput.value.trim() !== '') {
+                    const newItem = document.createElement('li');
+                    newItem.className = 'todo-item';
+                    newItem.innerHTML = `
+                        <div class="todo-text">
+                            <input type="checkbox">
+                            <span>${todoInput.value}</span>
+                        </div>
+                        <div class="todo-actions">
+                            <button><i class="fas fa-edit"></i></button>
+                            <button><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+                    todoList.appendChild(newItem);
+                    todoInput.value = '';
+                    
+                    // Add event listener to the new checkbox
+                    const checkbox = newItem.querySelector('input[type="checkbox"]');
+                    checkbox.addEventListener('change', function() {
+                        const text = this.nextElementSibling;
+                        if (this.checked) {
+                            text.classList.add('completed');
+                        } else {
+                            text.classList.remove('completed');
+                        }
+                    });
+                    
+                    // Add event listener to delete button
+                    const deleteBtn = newItem.querySelector('.fa-trash').parentNode;
+                    deleteBtn.addEventListener('click', function() {
+                        newItem.style.opacity = '0';
+                        newItem.style.transform = 'translateX(20px)';
+                        setTimeout(() => {
+                            newItem.remove();
+                        }, 300);
+                    });
+                }
+            });
+            
+            // Initialize existing checkboxes
+            document.querySelectorAll('.todo-item input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const text = this.nextElementSibling;
+                    if (this.checked) {
+                        text.classList.add('completed');
+                    } else {
+                        text.classList.remove('completed');
+                    }
+                });
+            });
+            
+            // Initialize existing delete buttons
+            document.querySelectorAll('.todo-actions .fa-trash').forEach(btn => {
+                btn.parentNode.addEventListener('click', function() {
+                    const item = this.closest('.todo-item');
+                    item.style.opacity = '0';
+                    item.style.transform = 'translateX(20px)';
+                    setTimeout(() => {
+                        item.remove();
+                    }, 300);
+                });
+            });
+            
+            // Image upload preview
+            const imageUpload = document.querySelector('.image-upload');
+            const imagePreview = document.querySelector('.image-preview');
+            
+            imageUpload.addEventListener('click', function() {
+                // In a real application, this would trigger a file input
+                // For demo purposes, we'll use a placeholder image
+                imagePreview.src = 'https://via.placeholder.com/400x300/6366F1/FFFFFF?text=Sample+Image';
+                imagePreview.style.display = 'block';
+                
+                // Simulate classification after a delay
+                setTimeout(function() {
+                    document.querySelector('.classification-result').textContent = 
+                        'Analysis: This appears to be a sample image with gradient background and text. In a real application, AI would analyze the image content.';
+                }, 2000);
+            });
+            
+            // Chat functionality
+            const chatInput = document.querySelector('.chat-input input');
+            const chatButton = document.querySelector('.chat-input button');
+            const chatMessages = document.querySelector('.chat-messages');
+            
+            chatButton.addEventListener('click', function() {
+                if (chatInput.value.trim() !== '') {
+                    // Add user message
+                    const userMessage = document.createElement('div');
+                    userMessage.className = 'message user-message';
+                    userMessage.textContent = chatInput.value;
+                    chatMessages.appendChild(userMessage);
+                    
+                    // Simulate bot response after a short delay
+                    setTimeout(function() {
+                        const botMessage = document.createElement('div');
+                        botMessage.className = 'message bot-message';
+                        botMessage.textContent = 'I understand your question about \"' + 
+                            chatInput.value + '\". In a real application, I would provide a detailed AI-powered response.';
+                        chatMessages.appendChild(botMessage);
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }, 1000);
+                    
+                    chatInput.value = '';
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            });
+            
+            // Allow pressing Enter to send chat message
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    chatButton.click();
+                }
+            });
+            
+            // Speech to text buttons
+            const startBtn = document.querySelector('.start-btn');
+            const stopBtn = document.querySelector('.stop-btn');
+            const speechText = document.querySelector('.speech-text');
+            
+            startBtn.addEventListener('click', function() {
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+                speechText.textContent = 'Listening... (this is a demo)';
+                
+                // Simulate speech recognition after a delay
+                setTimeout(function() {
+                    speechText.textContent = 'In a real application, your spoken words would appear here as text. This is a demonstration of the speech-to-text functionality. You can edit this text directly if needed.';
+                    startBtn.disabled = false;
+                    stopBtn.disabled = true;
+                }, 3000);
+            });
+            
+            stopBtn.addEventListener('click', function() {
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+                speechText.textContent = 'Speech recognition stopped. You can edit the text above directly.';
+            });
+        });
+    </script>
+</body>
+</html>
